@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Portal | Duckland</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <div class="actions" style="margin-bottom: 1rem">
+        <a class="btn secondary" href="/">Home</a>
+        <a class="btn secondary" href="/admin">Admin</a>
+      </div>
+
+      <section class="panel">
+        <h1>Request a Duck</h1>
+        <p class="muted">All new requests start as pending approval.</p>
+
+        <form id="duck-form">
+          <div class="grid-2">
+            <label>
+              Duck name
+              <input name="name" required />
+            </label>
+            <label>
+              Assembler
+              <input name="assember" required />
+            </label>
+          </div>
+
+          <label>
+            Adjectives (comma separated)
+            <input name="adjectives" placeholder="brave, chill, speedy" required />
+          </label>
+
+          <label>
+            Bio
+            <textarea name="bio" required></textarea>
+          </label>
+
+          <fieldset>
+            <legend>Duck Parts Colors</legend>
+            <div class="grid-2">
+              <label>Head <input type="color" name="head" value="#f0d35f" required /></label>
+              <label>Front 1 <input type="color" name="front1" value="#e9bc4f" required /></label>
+              <label>Front 2 <input type="color" name="front2" value="#d88f3d" required /></label>
+              <label>Back 1 <input type="color" name="back1" value="#9f6f2b" required /></label>
+              <label>Back 2 <input type="color" name="back2" value="#6f4b1f" required /></label>
+            </div>
+          </fieldset>
+
+          <label class="inline-check">
+            <input type="checkbox" name="derpy" />
+            Derpy
+          </label>
+
+          <section class="preview-shell" aria-label="Duck preview">
+            <h2>3D Preview</h2>
+            <p class="muted" style="margin-top: 0">Updates as you change duck colors.</p>
+            <div id="duck-preview" class="duck-preview" role="img" aria-label="Spinning 3D duck preview"></div>
+          </section>
+
+          <label>
+            Date
+            <input type="date" name="date" required />
+          </label>
+
+          <div class="grid-2">
+            <label>Strength <input type="number" name="strength" min="1" value="1" required /></label>
+            <label>Health <input type="number" name="health" min="1" value="1" required /></label>
+            <label>Focus <input type="number" name="focus" min="1" value="1" required /></label>
+            <label>Intelligence <input type="number" name="intelligence" min="1" value="1" required /></label>
+          </div>
+
+          <label>
+            Kindness
+            <input type="number" name="kindness" min="1" value="1" required />
+          </label>
+
+          <div class="actions">
+            <button type="submit">Submit Request</button>
+          </div>
+          <small id="form-status" class="muted"></small>
+        </form>
+      </section>
+    </main>
+    <script type="module" src="/users/app.js"></script>
+  </body>
+</html>
