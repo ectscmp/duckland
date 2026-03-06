@@ -22,10 +22,10 @@ type duckColor = `#${string}`;
 
 interface duckParts {
   head: duckColor;
-  front1: duckColor;
-  front2: duckColor;
-  back1: duckColor;
-  back2: duckColor;
+  frontLeft: duckColor;
+  frontRight: duckColor;
+  rearLeft: duckColor;
+  rearRight: duckColor;
 }
 
 export { type duckInfo, type duckStats, type duckParts, type duckColor };

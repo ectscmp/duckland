@@ -16,13 +16,13 @@ const openApiSpec = {
       },
       DuckParts: {
         type: "object",
-        required: ["head", "front1", "front2", "back1", "back2"],
+        required: ["head", "frontLeft", "frontRight", "rearLeft", "rearRight"],
         properties: {
           head: { $ref: "#/components/schemas/DuckColor" },
-          front1: { $ref: "#/components/schemas/DuckColor" },
-          front2: { $ref: "#/components/schemas/DuckColor" },
-          back1: { $ref: "#/components/schemas/DuckColor" },
-          back2: { $ref: "#/components/schemas/DuckColor" },
+          frontLeft: { $ref: "#/components/schemas/DuckColor" },
+          frontRight: { $ref: "#/components/schemas/DuckColor" },
+          rearLeft: { $ref: "#/components/schemas/DuckColor" },
+          rearRight: { $ref: "#/components/schemas/DuckColor" },
         },
       },
       DuckStats: {

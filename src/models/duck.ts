@@ -5,10 +5,10 @@ const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
 
 const duckParts: Schema<duckParts> = new Schema({
   head: { type: String, required: true, match: hexColorRegex },
-  front1: { type: String, required: true, match: hexColorRegex },
-  front2: { type: String, required: true, match: hexColorRegex },
-  back1: { type: String, required: true, match: hexColorRegex },
-  back2: { type: String, required: true, match: hexColorRegex },
+  frontLeft: { type: String, required: true, match: hexColorRegex },
+  frontRight: { type: String, required: true, match: hexColorRegex },
+  rearLeft: { type: String, required: true, match: hexColorRegex },
+  rearRight: { type: String, required: true, match: hexColorRegex },
 });
 
 const duckStats: Schema<duckStats> = new Schema({

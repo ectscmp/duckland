@@ -51,19 +51,19 @@ function partColorForMesh(mesh, colors) {
   }
 
   if (meshName.includes("front_right")) {
-    return toHex(colors.front1, "#e9bc4f");
+    return toHex(colors.frontRight, "#d88f3d");
   }
 
   if (meshName.includes("front_left")) {
-    return toHex(colors.front2, "#d88f3d");
+    return toHex(colors.frontLeft, "#e9bc4f");
   }
 
   if (meshName.includes("rear_right")) {
-    return toHex(colors.back1, "#9f6f2b");
+    return toHex(colors.rearRight, "#6f4b1f");
   }
 
   if (meshName.includes("rear_left")) {
-    return toHex(colors.back2, "#6f4b1f");
+    return toHex(colors.rearLeft, "#9f6f2b");
   }
 
   return null;

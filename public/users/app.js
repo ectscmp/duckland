@@ -4,7 +4,7 @@ const form = document.getElementById("duck-form");
 const statusText = document.getElementById("form-status");
 const dateInput = form.elements.namedItem("date");
 const previewContainer = document.getElementById("duck-preview");
-const colorFieldNames = ["head", "front1", "front2", "back1", "back2"];
+const colorFieldNames = ["head", "frontLeft", "frontRight", "rearLeft", "rearRight"];
 const derpyInput = form.elements.namedItem("derpy");
 
 dateInput.value = new Date().toISOString().slice(0, 10);
@@ -12,10 +12,10 @@ dateInput.value = new Date().toISOString().slice(0, 10);
 function readBodyColors(source) {
   return {
     head: String(source.get("head") || "#f0d35f"),
-    front1: String(source.get("front1") || "#e9bc4f"),
-    front2: String(source.get("front2") || "#d88f3d"),
-    back1: String(source.get("back1") || "#9f6f2b"),
-    back2: String(source.get("back2") || "#6f4b1f"),
+    frontLeft: String(source.get("frontLeft") || "#e9bc4f"),
+    frontRight: String(source.get("frontRight") || "#d88f3d"),
+    rearLeft: String(source.get("rearLeft") || "#9f6f2b"),
+    rearRight: String(source.get("rearRight") || "#6f4b1f"),
   };
 }
 
