@@ -21,7 +21,7 @@ const duckStats: Schema<duckStats> = new Schema({
 
 const duckInfo: Schema<duckInfo> = new Schema({
   name: { type: String, required: true },
-  assember: { type: String, required: true },
+  assembler: { type: String, required: true },
   adjectives: { type: [String], required: true },
   body: { type: duckParts, required: true },
   derpy: { type: Boolean, required: true, default: false },
