@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import attemptDatabaseConnection from "./database/connect.js";
@@ -13,7 +14,7 @@ const __dirname = path.dirname(__filename);
 const publicDir = path.resolve(__dirname, "..", "public");
 
 const PORT: number = Number(process.env.PORT ?? 3000);
-
+app.use(cors());
 app.use(express.json());
 app.use(express.static(publicDir));
 
