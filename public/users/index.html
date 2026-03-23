@@ -25,13 +25,17 @@
             </label>
             <label>
               Assembler
-              <input name="assember" required />
+              <input name="assembler" required />
             </label>
           </div>
 
           <label>
             Adjectives (comma separated)
-            <input name="adjectives" placeholder="brave, chill, speedy" required />
+            <input
+              name="adjectives"
+              placeholder="brave, chill, speedy"
+              required
+            />
           </label>
 
           <label>
@@ -42,11 +46,70 @@
           <fieldset>
             <legend>Duck Parts Colors</legend>
             <div class="grid-2">
-              <label>Head <input type="color" name="head" value="#f0d35f" required /></label>
-              <label>Front Left <input type="color" name="frontLeft" value="#e9bc4f" required /></label>
-              <label>Front Right <input type="color" name="frontRight" value="#d88f3d" required /></label>
-              <label>Rear Left <input type="color" name="rearLeft" value="#9f6f2b" required /></label>
-              <label>Rear Right <input type="color" name="rearRight" value="#6f4b1f" required /></label>
+              <label>
+                Head
+                <select name="head" required>
+                  <option value="red">Red</option>
+                  <option value="yellow" selected>Yellow</option>
+                  <option value="green">Green</option>
+                  <option value="blue">Blue</option>
+                  <option value="brown">Brown</option>
+                  <option value="purple">Purple</option>
+                  <option value="pink">Pink</option>
+                </select>
+              </label>
+
+              <label>
+                Front Left
+                <select name="frontLeft" required>
+                  <option value="red">Red</option>
+                  <option value="yellow">Yellow</option>
+                  <option value="green">Green</option>
+                  <option value="blue">Blue</option>
+                  <option value="brown" selected>Brown</option>
+                  <option value="purple">Purple</option>
+                  <option value="pink">Pink</option>
+                </select>
+              </label>
+
+              <label>
+                Front Right
+                <select name="frontRight" required>
+                  <option value="red">Red</option>
+                  <option value="yellow">Yellow</option>
+                  <option value="green">Green</option>
+                  <option value="blue">Blue</option>
+                  <option value="brown">Brown</option>
+                  <option value="purple" selected>Purple</option>
+                  <option value="pink">Pink</option>
+                </select>
+              </label>
+
+              <label>
+                Rear Left
+                <select name="rearLeft" required>
+                  <option value="red">Red</option>
+                  <option value="yellow">Yellow</option>
+                  <option value="green">Green</option>
+                  <option value="blue">Blue</option>
+                  <option value="brown" selected>Brown</option>
+                  <option value="purple">Purple</option>
+                  <option value="pink">Pink</option>
+                </select>
+              </label>
+
+              <label>
+                Rear Right
+                <select name="rearRight" required>
+                  <option value="red">Red</option>
+                  <option value="yellow">Yellow</option>
+                  <option value="green">Green</option>
+                  <option value="blue">Blue</option>
+                  <option value="brown" selected>Brown</option>
+                  <option value="purple">Purple</option>
+                  <option value="pink">Pink</option>
+                </select>
+              </label>
             </div>
           </fieldset>
 
@@ -57,8 +120,15 @@
 
           <section class="preview-shell" aria-label="Duck preview">
             <h2>3D Preview</h2>
-            <p class="muted" style="margin-top: 0">Updates as you change duck colors.</p>
-            <div id="duck-preview" class="duck-preview" role="img" aria-label="Spinning 3D duck preview"></div>
+            <p class="muted" style="margin-top: 0">
+              Updates as you change duck colors.
+            </p>
+            <div
+              id="duck-preview"
+              class="duck-preview"
+              role="img"
+              aria-label="Spinning 3D duck preview"
+            ></div>
           </section>
 
           <label>
@@ -67,10 +137,27 @@
           </label>
 
           <div class="grid-2">
-            <label>Strength <input type="number" name="strength" min="1" value="1" required /></label>
-            <label>Health <input type="number" name="health" min="1" value="1" required /></label>
-            <label>Focus <input type="number" name="focus" min="1" value="1" required /></label>
-            <label>Intelligence <input type="number" name="intelligence" min="1" value="1" required /></label>
+            <label
+              >Strength
+              <input type="number" name="strength" min="1" value="1" required
+            /></label>
+            <label
+              >Health
+              <input type="number" name="health" min="1" value="1" required
+            /></label>
+            <label
+              >Focus
+              <input type="number" name="focus" min="1" value="1" required
+            /></label>
+            <label
+              >Intelligence
+              <input
+                type="number"
+                name="intelligence"
+                min="1"
+                value="1"
+                required
+            /></label>
           </div>
 
           <label>

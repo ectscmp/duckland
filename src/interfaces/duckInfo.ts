@@ -1,6 +1,6 @@
 interface duckInfo {
   name: string;
-  assember: string;
+  assembler: string;
   adjectives: string[];
   body: duckParts;
   derpy: boolean; //default to true, remove comment after edits

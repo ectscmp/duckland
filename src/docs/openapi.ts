@@ -40,7 +40,7 @@ const openApiSpec = {
         type: "object",
         required: [
           "name",
-          "assember",
+          "assembler",
           "adjectives",
           "body",
           "derpy",
@@ -52,7 +52,7 @@ const openApiSpec = {
         properties: {
           _id: { type: "string", example: "67c60fce854914bf18568eca" },
           name: { type: "string", example: "Sir Quacksalot" },
-          assember: { type: "string", example: "Blandd" },
+          assembler: { type: "string", example: "Blandd" },
           adjectives: {
             type: "array",
             items: { type: "string" },
@@ -74,7 +74,7 @@ const openApiSpec = {
         additionalProperties: false,
         properties: {
           name: { type: "string" },
-          assember: { type: "string" },
+          assembler: { type: "string" },
           adjectives: { type: "array", items: { type: "string" } },
           body: { $ref: "#/components/schemas/DuckParts" },
           derpy: { type: "boolean" },
