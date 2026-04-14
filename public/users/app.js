@@ -4,18 +4,38 @@ const form = document.getElementById("duck-form");
 const statusText = document.getElementById("form-status");
 const dateInput = form.elements.namedItem("date");
 const previewContainer = document.getElementById("duck-preview");
-const colorFieldNames = ["head", "frontLeft", "frontRight", "rearLeft", "rearRight"];
+const colorFieldNames = [
+  "head",
+  "frontLeft",
+  "frontRight",
+  "rearLeft",
+  "rearRight",
+];
 const derpyInput = form.elements.namedItem("derpy");
 
 dateInput.value = new Date().toISOString().slice(0, 10);
 
+// color to hex function, probably needs replaced in the future
+function toHex(color) {
+  const colorDict = {
+    red: "#FF0000",
+    yellow: "#FFFF00",
+    green: "#008000",
+    blue: "#0000FF",
+    brown: "#8B4513",
+    purple: "#800080",
+    pink: "#FFC0CB",
+  };
+  return colorDict[color];
+}
+
 function readBodyColors(source) {
   return {
-    head: String(source.get("head") || "#f0d35f"),
-    frontLeft: String(source.get("frontLeft") || "#e9bc4f"),
-    frontRight: String(source.get("frontRight") || "#d88f3d"),
-    rearLeft: String(source.get("rearLeft") || "#9f6f2b"),
-    rearRight: String(source.get("rearRight") || "#6f4b1f"),
+    head: toHex(String(source.get("head")) || "#f0d35f"),
+    frontLeft: toHex(String(source.get("frontLeft")) || "#e9bc4f"),
+    frontRight: toHex(String(source.get("frontRight")) || "#d88f3d"),
+    rearLeft: toHex(String(source.get("rearLeft")) || "#9f6f2b"),
+    rearRight: toHex(String(source.get("rearRight")) || "#6f4b1f"),
   };
 }
 
@@ -60,13 +80,19 @@ form.addEventListener("submit", async (event) => {
 
   const payload = {
     name: String(data.get("name") || "").trim(),
-    assember: String(data.get("assember") || "").trim(),
+    assembler: String(data.get("assembler") || "").trim(),
     adjectives: adjectivesRaw
       .split(",")
       .map((entry) => entry.trim())
       .filter(Boolean),
     body: {
-      ...readBodyColors(data),
+      // ...readBodyColors(data) - changed because we need base color strings
+      // this solution is pretty bad but it gets the job done for now
+      head: String(data.get("head") || "#f0d35f"),
+      frontLeft: String(data.get("frontLeft") || "#e9bc4f"),
+      frontRight: String(data.get("frontRight") || "#d88f3d"),
+      rearLeft: String(data.get("rearLeft") || "#9f6f2b"),
+      rearRight: String(data.get("rearRight") || "#6f4b1f"),
     },
     derpy: data.get("derpy") === "on",
     bio: String(data.get("bio") || "").trim(),
@@ -100,6 +126,7 @@ form.addEventListener("submit", async (event) => {
     statusText.textContent = "Duck request sent. Waiting for admin approval.";
   } catch (error) {
     statusText.className = "error";
-    statusText.textContent = "Could not submit request. Check fields and try again.";
+    statusText.textContent =
+      "Could not submit request. Check fields and try again.";
   }
 });

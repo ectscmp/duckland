@@ -18,7 +18,7 @@ interface duckStats {
   kindness: number;
 }
 
-type duckColor = `#${string}`;
+type duckColor = `${string}`;
 
 interface duckParts {
   head: duckColor;

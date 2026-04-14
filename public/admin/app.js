@@ -10,7 +10,7 @@ function renderCard(duck) {
   card.className = "card";
 
   const title = document.createElement("h3");
-  title.textContent = `${duck.name} by ${duck.assember}`;
+  title.textContent = `${duck.name} by ${duck.assembler}`;
 
   const bio = document.createElement("p");
   bio.textContent = duck.bio;

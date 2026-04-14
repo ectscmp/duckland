@@ -1,14 +1,23 @@
 import { model, Schema } from "mongoose";
 import type { duckParts, duckStats, duckInfo } from "../interfaces/duckInfo.js";
 
-const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
+const COLORS = [
+  "black",
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "white",
+  "pink",
+  "purple",
+];
 
-const duckParts: Schema<duckParts> = new Schema({
-  head: { type: String, required: true, match: hexColorRegex },
-  frontLeft: { type: String, required: true, match: hexColorRegex },
-  frontRight: { type: String, required: true, match: hexColorRegex },
-  rearLeft: { type: String, required: true, match: hexColorRegex },
-  rearRight: { type: String, required: true, match: hexColorRegex },
+const duckParts = new Schema({
+  head: { type: String, required: true, enum: COLORS },
+  frontLeft: { type: String, required: true, enum: COLORS },
+  frontRight: { type: String, required: true, enum: COLORS },
+  rearLeft: { type: String, required: true, enum: COLORS },
+  rearRight: { type: String, required: true, enum: COLORS },
 });
 
 const duckStats: Schema<duckStats> = new Schema({
