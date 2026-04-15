@@ -6,16 +6,59 @@ import { fileURLToPath } from "node:url";
 import attemptDatabaseConnection from "./database/connect.js";
 import openApiSpec from "./docs/openapi.js";
 import duckRouter from "./routes/ducks.js";
+import session from "express-session";
+import { ConfidentialClientApplication } from "@azure/msal-node";
+import dotenv from "dotenv";
+
+
 
 await attemptDatabaseConnection();
 const app: express.Application = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.resolve(__dirname, "..", "public");
+const clientId = process.env.CLIENT_ID as string; 
+const clientSecret = process.env.SECRET_ID as string;
+const tenantId = process.env.TENANT_ID as string;
+dotenv.config();
 
 const PORT: number = Number(process.env.PORT ?? 3000);
+const msalConfig = {
+  auth: {
+    clientId: clientId,
+    authority: `https://login.microsoftonline.com/${tenantId}`,
+    clientSecret: clientSecret,
+  }
+};
+const msalClient = new ConfidentialClientApplication(msalConfig);
+
 app.use(cors());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "dev_secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // true only in HTTPS
+    },
+  })
+);
 app.use(express.json());
+
+app.get("/", async (_req, res) => {
+  console.log("hit")
+  if (_req.session.user) {
+    return res.sendFile(path.join(publicDir, "index.html"));
+  }
+  const authCodeUrlParameters = {
+    scopes: ["user.read"],
+    redirectUri: "http://localhost:3000/redirect",
+  };
+
+  const authUrl = await msalClient.getAuthCodeUrl(authCodeUrlParameters);
+  res.redirect(authUrl);
+});
+
 app.use(express.static(publicDir));
 
 app.get("/users", (_req, res) => {
@@ -26,9 +69,27 @@ app.get("/admin", (_req, res) => {
   res.sendFile(path.join(publicDir, "admin", "index.html"));
 });
 
-app.get("/", (_req, res) => {
-  res.sendFile(path.join(publicDir, "index.html"));
+
+
+app.get("/redirect", async (req, res) => {
+  const tokenRequest = {
+    code: req.query.code as string,
+    scopes: ["user.read"],
+    redirectUri: "http://localhost:3000/redirect",
+  };
+
+  try {
+    const response = await msalClient.acquireTokenByCode(tokenRequest);
+
+    req.session.user = response.account;
+
+    res.redirect("/");
+  } catch (err) {
+    console.error(err);
+    res.send("Auth failed");
+  }
 });
+
 
 app.use("/ducks", duckRouter);
 

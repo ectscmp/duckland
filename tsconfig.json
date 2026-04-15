@@ -8,10 +8,11 @@
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "esnext",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
 
     // For nodejs:
     "lib": ["esnext"],
-    "types": ["node"],
+    "types": ["node", "express-session"],
 
     // Other Outputs
     "sourceMap": true,
@@ -38,5 +39,6 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true
-  }
+  },
+  "include": ["src"]
 }

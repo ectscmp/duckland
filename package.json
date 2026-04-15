@@ -1,15 +1,18 @@
 {
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/express-session": "^1.18.2",
     "@types/node": "^25.3.5",
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@azure/msal-node": "^5.1.2",
     "@types/cors": "^2.8.19",
     "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongoose": "^9.2.2"
+    "express-session": "^1.19.0",
+    "mongoose": "^9.4.1"
   },
   "name": "duckland",
   "version": "1.0.0",
