@@ -10,15 +10,13 @@ import session from "express-session";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import dotenv from "dotenv";
 
-
-
 await attemptDatabaseConnection();
 const app: express.Application = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.resolve(__dirname, "..", "public");
-const clientId = process.env.CLIENT_ID as string; 
-const clientSecret = process.env.SECRET_ID as string;
+const clientId = process.env.CLIENT_ID as string;
+const clientSecret = process.env.SECRET_VALUE as string;
 const tenantId = process.env.TENANT_ID as string;
 dotenv.config();
 
@@ -28,7 +26,7 @@ const msalConfig = {
     clientId: clientId,
     authority: `https://login.microsoftonline.com/${tenantId}`,
     clientSecret: clientSecret,
-  }
+  },
 };
 const msalClient = new ConfidentialClientApplication(msalConfig);
 
@@ -41,15 +39,16 @@ app.use(
     cookie: {
       secure: false, // true only in HTTPS
     },
-  })
+  }),
 );
 app.use(express.json());
 
 app.get("/", async (_req, res) => {
-  console.log("hit")
+
   if (_req.session.user) {
     return res.sendFile(path.join(publicDir, "index.html"));
   }
+  
   const authCodeUrlParameters = {
     scopes: ["user.read"],
     redirectUri: "http://localhost:3000/redirect",
@@ -69,19 +68,22 @@ app.get("/admin", (_req, res) => {
   res.sendFile(path.join(publicDir, "admin", "index.html"));
 });
 
-
-
-app.get("/redirect", async (req, res) => {
+app.get("/redirect", async (_req, res) => {
+  const code = _req.query.code as string
   const tokenRequest = {
-    code: req.query.code as string,
+    code: code,
     scopes: ["user.read"],
     redirectUri: "http://localhost:3000/redirect",
-  };
-
+  };  
+  console.log("CODE:", code)
   try {
     const response = await msalClient.acquireTokenByCode(tokenRequest);
 
-    req.session.user = response.account;
+
+    if (!response.account) {
+      return res.status(500).send("Authentication failed: no account returned");
+    }
+    _req.session.user = response.account;
 
     res.redirect("/");
   } catch (err) {
@@ -89,7 +91,6 @@ app.get("/redirect", async (req, res) => {
     res.send("Auth failed");
   }
 });
-
 
 app.use("/ducks", duckRouter);
 
