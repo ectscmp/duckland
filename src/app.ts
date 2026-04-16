@@ -9,6 +9,9 @@ import duckRouter from "./routes/ducks.js";
 import session from "express-session";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import dotenv from "dotenv";
+import {NextFunction} from "express";
+import mongoose from "mongoose";
+import { Admin } from "./models/admin.js";
 
 await attemptDatabaseConnection();
 const app: express.Application = express();
@@ -18,6 +21,7 @@ const publicDir = path.resolve(__dirname, "..", "public");
 const clientId = process.env.CLIENT_ID as string;
 const clientSecret = process.env.SECRET_VALUE as string;
 const tenantId = process.env.TENANT_ID as string;
+const redirectUri = process.env.REDIRECT_URI as string
 dotenv.config();
 
 const PORT: number = Number(process.env.PORT ?? 3000);
@@ -43,19 +47,38 @@ app.use(
 );
 app.use(express.json());
 
-app.get("/", async (_req, res) => {
+function authMiddleware(_req: Request, res: Response, next: NextFunction){
+mongoose.connect(process.env.MONGO_CONNECTION_URI!)
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.error("Mongo error:", err));
+}
 
+app.get("/", async (_req, res) => {
   if (_req.session.user) {
     return res.sendFile(path.join(publicDir, "index.html"));
   }
-  
+
   const authCodeUrlParameters = {
     scopes: ["user.read"],
-    redirectUri: "http://localhost:3000/redirect",
+    redirectUri: redirectUri,
   };
 
   const authUrl = await msalClient.getAuthCodeUrl(authCodeUrlParameters);
   res.redirect(authUrl);
+});
+
+app.get("/signout", (_req, res) => {
+  _req.session.destroy((err) => {
+    if (err) {
+      return console.error(err);
+    }
+    res.clearCookie("connect.sid")
+    const logoutUrl =
+      "https://login.microsoftonline.com/common/oauth2/v2.0/logout" +
+      `?post_logout_redirect_uri=http://localhost:3000/`;
+
+    return res.redirect(logoutUrl);
+  });
 });
 
 app.use(express.static(publicDir));
@@ -69,16 +92,15 @@ app.get("/admin", (_req, res) => {
 });
 
 app.get("/redirect", async (_req, res) => {
-  const code = _req.query.code as string
+  const code = _req.query.code as string;
   const tokenRequest = {
     code: code,
     scopes: ["user.read"],
-    redirectUri: "http://localhost:3000/redirect",
-  };  
-  console.log("CODE:", code)
+    redirectUri: redirectUri,
+  };
+
   try {
     const response = await msalClient.acquireTokenByCode(tokenRequest);
-
 
     if (!response.account) {
       return res.status(500).send("Authentication failed: no account returned");
