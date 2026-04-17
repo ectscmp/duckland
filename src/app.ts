@@ -6,28 +6,118 @@ import { fileURLToPath } from "node:url";
 import attemptDatabaseConnection from "./database/connect.js";
 import openApiSpec from "./docs/openapi.js";
 import duckRouter from "./routes/ducks.js";
+import session from "express-session";
+import { ConfidentialClientApplication } from "@azure/msal-node";
+import dotenv from "dotenv";
+import type { Request, Response, NextFunction } from "express";
+import { Admin } from "./models/admin.js";
 
 await attemptDatabaseConnection();
 const app: express.Application = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.resolve(__dirname, "..", "public");
+const clientId = process.env.CLIENT_ID as string;
+const clientSecret = process.env.SECRET_VALUE as string;
+const tenantId = process.env.TENANT_ID as string;
+const redirectUri = process.env.REDIRECT_URI as string;
+dotenv.config();
 
 const PORT: number = Number(process.env.PORT ?? 3000);
+const msalConfig = {
+  auth: {
+    clientId: clientId,
+    authority: `https://login.microsoftonline.com/${tenantId}`,
+    clientSecret: clientSecret,
+  },
+};
+const msalClient = new ConfidentialClientApplication(msalConfig);
+
 app.use(cors());
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "dev_secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // true only in HTTPS
+    },
+  }),
+);
 app.use(express.json());
+
+async function authMiddleware(_req: Request, res: Response, next: NextFunction) {
+  const admin = await Admin.findOne({email: _req.session.user?.username as string})
+  console.log(admin)
+  if(!admin){
+    return res.redirect("/")
+  }else{
+    return next()
+  }
+}
+
+app.get("/", async (_req, res) => {
+  if (_req.session.user) {
+    return res.sendFile(path.join(publicDir, "index.html"));
+  }
+
+  const authCodeUrlParameters = {
+    scopes: ["user.read"],
+    redirectUri: redirectUri,
+  };
+
+  const authUrl = await msalClient.getAuthCodeUrl(authCodeUrlParameters);
+  res.redirect(authUrl);
+});
+
+app.get("/signout", (_req, res) => {
+  _req.session.destroy((err) => {
+    if (err) {
+      return console.error(err);
+    }
+    res.clearCookie("connect.sid");
+    const logoutUrl =
+      "https://login.microsoftonline.com/common/oauth2/v2.0/logout" +
+      `?post_logout_redirect_uri=${process.env.BASE_URL}`;
+
+    return res.redirect(logoutUrl);
+  });
+});
+
+app.get("/admin", authMiddleware, (_req, res) => {
+  res.sendFile(path.join(publicDir, "admin", "index.html"));
+});
+
 app.use(express.static(publicDir));
 
 app.get("/users", (_req, res) => {
   res.sendFile(path.join(publicDir, "users", "index.html"));
 });
 
-app.get("/admin", (_req, res) => {
-  res.sendFile(path.join(publicDir, "admin", "index.html"));
-});
 
-app.get("/", (_req, res) => {
-  res.sendFile(path.join(publicDir, "index.html"));
+
+app.get("/redirect", async (_req, res) => {
+  const code = _req.query.code as string;
+  const tokenRequest = {
+    code: code,
+    scopes: ["user.read"],
+    redirectUri: redirectUri,
+  };
+
+  try {
+    const response = await msalClient.acquireTokenByCode(tokenRequest);
+
+    if (!response.account) {
+      return res.status(500).send("Authentication failed: no account returned");
+    }
+    _req.session.user = response.account;
+    console.log(response.account)
+
+    res.redirect("/");
+  } catch (err) {
+    console.error(err);
+    res.send("Auth failed");
+  }
 });
 
 app.use("/ducks", duckRouter);
