@@ -9,8 +9,7 @@ import duckRouter from "./routes/ducks.js";
 import session from "express-session";
 import { ConfidentialClientApplication } from "@azure/msal-node";
 import dotenv from "dotenv";
-import {NextFunction} from "express";
-import mongoose from "mongoose";
+import type { Request, Response, NextFunction } from "express";
 import { Admin } from "./models/admin.js";
 
 await attemptDatabaseConnection();
@@ -21,7 +20,7 @@ const publicDir = path.resolve(__dirname, "..", "public");
 const clientId = process.env.CLIENT_ID as string;
 const clientSecret = process.env.SECRET_VALUE as string;
 const tenantId = process.env.TENANT_ID as string;
-const redirectUri = process.env.REDIRECT_URI as string
+const redirectUri = process.env.REDIRECT_URI as string;
 dotenv.config();
 
 const PORT: number = Number(process.env.PORT ?? 3000);
@@ -47,10 +46,14 @@ app.use(
 );
 app.use(express.json());
 
-function authMiddleware(_req: Request, res: Response, next: NextFunction){
-mongoose.connect(process.env.MONGO_CONNECTION_URI!)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error("Mongo error:", err));
+async function authMiddleware(_req: Request, res: Response, next: NextFunction) {
+  const admin = await Admin.findOne({email: _req.session.user?.username as string})
+  console.log(admin)
+  if(!admin){
+    return res.redirect("/")
+  }else{
+    return next()
+  }
 }
 
 app.get("/", async (_req, res) => {
@@ -72,7 +75,7 @@ app.get("/signout", (_req, res) => {
     if (err) {
       return console.error(err);
     }
-    res.clearCookie("connect.sid")
+    res.clearCookie("connect.sid");
     const logoutUrl =
       "https://login.microsoftonline.com/common/oauth2/v2.0/logout" +
       `?post_logout_redirect_uri=http://localhost:3000/`;
@@ -81,15 +84,17 @@ app.get("/signout", (_req, res) => {
   });
 });
 
+app.get("/admin", authMiddleware, (_req, res) => {
+  res.sendFile(path.join(publicDir, "admin", "index.html"));
+});
+
 app.use(express.static(publicDir));
 
 app.get("/users", (_req, res) => {
   res.sendFile(path.join(publicDir, "users", "index.html"));
 });
 
-app.get("/admin", (_req, res) => {
-  res.sendFile(path.join(publicDir, "admin", "index.html"));
-});
+
 
 app.get("/redirect", async (_req, res) => {
   const code = _req.query.code as string;
@@ -106,6 +111,7 @@ app.get("/redirect", async (_req, res) => {
       return res.status(500).send("Authentication failed: no account returned");
     }
     _req.session.user = response.account;
+    console.log(response.account)
 
     res.redirect("/");
   } catch (err) {

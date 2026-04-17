@@ -11,4 +11,13 @@ declare module "express-serve-static-core" {
   }
 }
 
+declare module "express-session" {
+  interface SessionData {
+    user?: {
+      username?: string;
+      email?: string;
+    };
+  }
+}
+
 export {};

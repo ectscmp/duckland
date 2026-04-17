@@ -26,7 +26,8 @@ body {
   padding: 1.25rem;
 }
 
-h1, h2 {
+h1,
+h2 {
   margin-top: 0;
 }
 
@@ -83,7 +84,9 @@ label {
 }
 
 input,
-textarea {
+textarea,
+select,
+fieldset {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 10px;
