@@ -11,6 +11,7 @@ import { ConfidentialClientApplication } from "@azure/msal-node";
 import dotenv from "dotenv";
 import type { Request, Response, NextFunction } from "express";
 import { Admin } from "./models/admin.js";
+import { userInfo } from "node:os";
 
 await attemptDatabaseConnection();
 const app: express.Application = express();
@@ -46,10 +47,17 @@ app.use(
 );
 app.use(express.json());
 
-async function authMiddleware(_req: Request, res: Response, next: NextFunction) {
+async function checkAdmin(_req: Request, res: Response, next: NextFunction) {
   const admin = await Admin.findOne({email: _req.session.user?.username as string})
-  console.log(admin)
   if(!admin){
+    return res.redirect("/?admin_issue=true")
+  }else{
+    return next()
+  }
+}
+
+async function checkUser(_req: Request, res: Response, next: NextFunction) {
+  if (!_req.session.user){
     return res.redirect("/")
   }else{
     return next()
@@ -57,8 +65,12 @@ async function authMiddleware(_req: Request, res: Response, next: NextFunction) 
 }
 
 app.get("/", async (_req, res) => {
-  if (_req.session.user) {
-    return res.sendFile(path.join(publicDir, "index.html"));
+  let admin_issue = _req.query.admin_issue
+
+  if (Boolean(admin_issue)) {
+    return res.sendFile(path.join(publicDir, "index_bad_admin.html"));
+  }else if (_req.session.user && !Boolean(admin_issue)){
+    return res.sendFile(path.join(publicDir, "index.html"))
   }
 
   const authCodeUrlParameters = {
@@ -84,15 +96,18 @@ app.get("/signout", (_req, res) => {
   });
 });
 
-app.get("/admin", authMiddleware, (_req, res) => {
+app.get("/admin", checkUser, checkAdmin, (_req, res) => {
   res.sendFile(path.join(publicDir, "admin", "index.html"));
 });
 
-app.use(express.static(publicDir));
-
-app.get("/users", (_req, res) => {
+app.get("/users", checkUser, (_req, res) => {
   res.sendFile(path.join(publicDir, "users", "index.html"));
 });
+
+
+app.use(express.static(publicDir));
+
+
 
 
 
@@ -111,7 +126,6 @@ app.get("/redirect", async (_req, res) => {
       return res.status(500).send("Authentication failed: no account returned");
     }
     _req.session.user = response.account;
-    console.log(response.account)
 
     res.redirect("/");
   } catch (err) {
