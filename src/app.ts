@@ -48,29 +48,31 @@ app.use(
 app.use(express.json());
 
 async function checkAdmin(_req: Request, res: Response, next: NextFunction) {
-  const admin = await Admin.findOne({email: _req.session.user?.username as string})
-  if(!admin){
-    return res.redirect("/?admin_issue=true")
-  }else{
-    return next()
+  const admin = await Admin.findOne({
+    email: _req.session.user?.username as string,
+  });
+  if (!admin) {
+    return res.redirect("/?admin_issue=true");
+  } else {
+    return next();
   }
 }
 
 async function checkUser(_req: Request, res: Response, next: NextFunction) {
-  if (!_req.session.user){
-    return res.redirect("/")
-  }else{
-    return next()
+  if (!_req.session.user) {
+    return res.redirect("/");
+  } else {
+    return next();
   }
 }
 
 app.get("/", async (_req, res) => {
-  let admin_issue = _req.query.admin_issue
+  let admin_issue = Boolean(_req.query.admin_issue);
 
-  if (Boolean(admin_issue)) {
+  if (admin_issue) {
     return res.sendFile(path.join(publicDir, "index_bad_admin.html"));
-  }else if (_req.session.user && !Boolean(admin_issue)){
-    return res.sendFile(path.join(publicDir, "index.html"))
+  } else if (_req.session.user && !admin_issue) {
+    return res.sendFile(path.join(publicDir, "index.html"));
   }
 
   const authCodeUrlParameters = {
@@ -104,12 +106,15 @@ app.get("/users", checkUser, (_req, res) => {
   res.sendFile(path.join(publicDir, "users", "index.html"));
 });
 
+app.get("/admin-aprove", checkUser, checkAdmin, (_req, res) => {
+  res.sendFile(path.join(publicDir, "admin-aprove", "index.html"));
+});
+
+app.get("/admin-review", checkUser, checkAdmin, (_req, res) => {
+  res.sendFile(path.join(publicDir, "admin-review", "index.html"));
+});
 
 app.use(express.static(publicDir));
-
-
-
-
 
 app.get("/redirect", async (_req, res) => {
   const code = _req.query.code as string;
