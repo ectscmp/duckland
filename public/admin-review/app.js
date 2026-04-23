@@ -90,11 +90,14 @@ function renderCard(duck) {
 }
 
 function createSelect(ducks) {
-  console.log(ducks)
-  for (let duck in ducks) {
-    console.log(ducks[duck]);
+  console.log(ducks);
+  ducks.forEach((duck) => {
+  
     opt = document.createElement("option");
-  }
+    opt.value = duck.name;
+    dropDown.innerHTML += opt;
+    console.log(dropDown);
+  });
 }
 
 async function loadPending() {
@@ -110,7 +113,8 @@ async function loadPending() {
     }
 
     const ducks = await response.json();
-    const pending = createSelect(ducks);
+    const pending = ducks.filter((duck) => duck.approved);
+    createSelect(pending);
 
     if (!pending.length) {
       display.innerHTML = `<div class="card"><p class="muted">No pending requests.</p></div>`;

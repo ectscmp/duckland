@@ -27,5 +27,13 @@
   "keywords": [],
   "author": "blandd",
   "license": "ISC",
-  "description": "The amazing duckland, api designed by yours truly, Tony .G Spencer"
+  "description": "The amazing duckland, api designed by yours truly, Tony .G Spencer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/logan-ul/duckland.git"
+  },
+  "bugs": {
+    "url": "https://github.com/logan-ul/duckland/issues"
+  },
+  "homepage": "https://github.com/logan-ul/duckland#readme"
 }
