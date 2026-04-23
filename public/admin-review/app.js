@@ -90,8 +90,9 @@ function renderCard(duck) {
 }
 
 function createSelect(ducks) {
+  console.log(ducks)
   for (let duck in ducks) {
-    console.log(duck);
+    console.log(ducks[duck]);
     opt = document.createElement("option");
   }
 }
