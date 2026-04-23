@@ -178,3 +178,12 @@ small.ok {
     grid-template-columns: 1fr;
   }
 }
+
+.nav-bar {
+  display: flex;
+  width: 100vw;
+}
+
+#sign-out {
+  margin: 10px;
+}
