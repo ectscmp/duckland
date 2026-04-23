@@ -1,7 +1,7 @@
 import { createDuckPreview } from "/shared/duckPreview.js";
 
-const listEl = document.getElementById("pending-list");
-const statusEl = document.getElementById("admin-status");
+const display = document.getElementById("pending-list");
+const dropDown = document.getElementById("duck-selection");
 const refreshBtn = document.getElementById("refresh");
 const previewHandles = new Set();
 
@@ -33,7 +33,10 @@ function renderCard(duck) {
   preview.setAttribute("aria-label", `${duck.name} 3D preview`);
 
   let previewHandle = null;
-  createDuckPreview(preview, { colors: duck.body || {}, derpy: Boolean(duck.derpy) })
+  createDuckPreview(preview, {
+    colors: duck.body || {},
+    derpy: Boolean(duck.derpy),
+  })
     .then((handle) => {
       previewHandle = handle;
       previewHandles.add(handle);
@@ -70,8 +73,8 @@ function renderCard(duck) {
         previewHandles.delete(previewHandle);
       }
       card.remove();
-      if (!listEl.children.length) {
-        listEl.innerHTML = `<div class="card"><p class="muted">No pending requests.</p></div>`;
+      if (!display.children.length) {
+        display.innerHTML = `<div class="card"><p class="muted">No pending requests.</p></div>`;
       }
     } catch (error) {
       approveBtn.disabled = false;
@@ -86,13 +89,18 @@ function renderCard(duck) {
   return card;
 }
 
+function createSelect(ducks) {
+  for (let duck in ducks) {
+    console.log(duck);
+    opt = document.createElement("option");
+  }
+}
+
 async function loadPending() {
   previewHandles.forEach((handle) => handle.dispose());
   previewHandles.clear();
 
-  statusEl.className = "muted";
-  statusEl.textContent = "Loading...";
-  listEl.innerHTML = "";
+  display.innerHTML = "";
 
   try {
     const response = await fetch("/ducks");
@@ -101,22 +109,17 @@ async function loadPending() {
     }
 
     const ducks = await response.json();
-    const pending = ducks.filter((duck) => !duck.approved);
+    const pending = createSelect(ducks);
 
     if (!pending.length) {
-      listEl.innerHTML = `<div class="card"><p class="muted">No pending requests.</p></div>`;
+      display.innerHTML = `<div class="card"><p class="muted">No pending requests.</p></div>`;
     } else {
       pending.forEach((duck) => {
-        listEl.append(renderCard(duck));
+        display.append(renderCard(duck));
       });
     }
-
-    statusEl.className = "ok";
-    statusEl.textContent = `Showing ${pending.length} pending request(s).`;
   } catch (error) {
-    statusEl.className = "error";
-    statusEl.textContent = "Could not load duck requests.";
-    listEl.innerHTML = "";
+    display.innerHTML = "";
   }
 }
 

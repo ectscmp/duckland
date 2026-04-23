@@ -2,14 +2,13 @@ import { model, Schema } from "mongoose";
 import type { duckParts, duckStats, duckInfo } from "../interfaces/duckInfo.js";
 
 const COLORS = [
-  "black",
   "red",
   "blue",
   "green",
   "yellow",
-  "white",
   "pink",
   "purple",
+  "brown"
 ];
 
 const duckParts = new Schema({

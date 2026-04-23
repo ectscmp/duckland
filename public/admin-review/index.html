@@ -1,11 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>This is the admin review page</h1>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Portal | Duckland</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <div class="actions" style="margin-bottom: 1rem">
+        <a class="btn secondary" href="/admin">Back</a>
+        <a class="btn secondary" href="/admin-review">Current Ducks</a>
+      </div>
+
+      <section class="panel">
+        <div
+          class="actions"
+          style="justify-content: space-between; align-items: center"
+        >
+        <select name="Ducks" id="duck-selection"></select>
+          <button id="refresh" class="secondary" type="button">Refresh</button>
+        </div>
+        <div id="pending-list" class="cards" style="margin-top: 0.75rem"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/admin-review/app.js"></script>
+  </body>
 </html>
