@@ -92,7 +92,7 @@ app.get("/signout", (_req, res) => {
     res.clearCookie("connect.sid");
     const logoutUrl =
       "https://login.microsoftonline.com/common/oauth2/v2.0/logout" +
-      `?post_logout_redirect_uri=http://localhost:3000/`;
+      `?post_logout_redirect_uri=${process.env.BASE_URL}`;
 
     return res.redirect(logoutUrl);
   });
