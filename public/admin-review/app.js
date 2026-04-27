@@ -5,24 +5,42 @@ const dropDown = document.getElementById("duck-selection");
 const refreshBtn = document.getElementById("refresh");
 const previewHandles = new Set();
 
-function chooseDefualtColor(color) {
-  //template = `<select name="head" required>
-  //                <option value="red">Red</option>
-  //                <option value="yellow">Yellow</option>
-  //                <option value="green">Green</option>
-  //                <option value="blue">Blue</option>
-  //                <option value="brown">Brown</option>
-  //                <option value="purple">Purple</option>
-  //                <option value="pink">Pink</option>
-  //              </select>`;
-  template = `<select name="head" required></select>`;
-  color_list = ["red", "yellow", "green", "blue", "brown", "purple", "pink"]
-  options = ""
-  color_list.forEach(color=>{
-    options += `<option value="red">Red</option>`
-  })
-  
-  
+function checkDerpy(duck) {
+  if (duck.derpy) {
+    return "checked";
+  }
+}
+
+function chooseDefualtColor(selected_color) {
+  const color_list = [
+    "red",
+    "yellow",
+    "green",
+    "blue",
+    "brown",
+    "purple",
+    "pink",
+  ];
+  let options = "";
+  color_list.forEach((color) => {
+    if (color.toLowerCase() == selected_color.toLowerCase()) {
+      options += `<option value="${color.toLowerCase()}" selected>${color.charAt(0).toUpperCase() + color.slice(1)}</option> `;
+    } else {
+      options += `<option value="${color.toLowerCase()}">${color.charAt(0).toUpperCase() + color.slice(1)}</option> `;
+    }
+  });
+  console.log(options);
+  return options;
+}
+
+function formatDate(isoString) {
+  const date = new Date(isoString);
+
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
 
 function renderDuck(duck) {
@@ -58,72 +76,42 @@ function renderDuck(duck) {
               <label>
                 Head
                 <select name="head" required>
-                  <option value="red">Red</option>
-                  <option value="yellow" selected>Yellow</option>
-                  <option value="green">Green</option>
-                  <option value="blue">Blue</option>
-                  <option value="brown">Brown</option>
-                  <option value="purple">Purple</option>
-                  <option value="pink">Pink</option>
+                  ${chooseDefualtColor(duck.body.head)}
                 </select>
               </label>
 
               <label>
                 Front Left
                 <select name="frontLeft" required>
-                  <option value="red">Red</option>
-                  <option value="yellow">Yellow</option>
-                  <option value="green">Green</option>
-                  <option value="blue">Blue</option>
-                  <option value="brown" selected>Brown</option>
-                  <option value="purple">Purple</option>
-                  <option value="pink">Pink</option>
+                  ${chooseDefualtColor(duck.body.frontLeft)}
                 </select>
               </label>
 
               <label>
                 Front Right
                 <select name="frontRight" required>
-                  <option value="red">Red</option>
-                  <option value="yellow">Yellow</option>
-                  <option value="green">Green</option>
-                  <option value="blue">Blue</option>
-                  <option value="brown">Brown</option>
-                  <option value="purple" selected>Purple</option>
-                  <option value="pink">Pink</option>
+                  ${chooseDefualtColor(duck.body.frontRight)}
                 </select>
               </label>
 
               <label>
                 Rear Left
                 <select name="rearLeft" required>
-                  <option value="red">Red</option>
-                  <option value="yellow">Yellow</option>
-                  <option value="green">Green</option>
-                  <option value="blue">Blue</option>
-                  <option value="brown" selected>Brown</option>
-                  <option value="purple">Purple</option>
-                  <option value="pink">Pink</option>
+                  ${chooseDefualtColor(duck.body.rearLeft)}>
                 </select>
               </label>
 
               <label>
                 Rear Right
                 <select name="rearRight" required>
-                  <option value="red">Red</option>
-                  <option value="yellow">Yellow</option>
-                  <option value="green">Green</option>
-                  <option value="blue">Blue</option>
-                  <option value="brown" selected>Brown</option>
-                  <option value="purple">Purple</option>
-                  <option value="pink">Pink</option>
+                  ${chooseDefualtColor(duck.body.rearRight)}
                 </select>
               </label>
             </div>
           </fieldset>
 
           <label class="inline-check">
-            <input type="checkbox" name="derpy" />
+            <input type="checkbox" name="derpy" ${checkDerpy(duck)}/>
             Derpy
           </label>
 
@@ -142,21 +130,21 @@ function renderDuck(duck) {
 
           <label>
             Date
-            <input type="date" name="date" required />
+            <input type="date" name="date" value="${formatDate(duck.date.$date)}" required />
           </label>
 
           <div class="grid-2">
             <label
               >Strength
-              <input type="number" name="strength" min="1" value="1" required
+              <input type="number" name="strength" min="1" value="${duck.stats.strength}" required
             /></label>
             <label
               >Health
-              <input type="number" name="health" min="1" value="1" required
+              <input type="number" name="health" min="1" value="${duck.stats.health}" required
             /></label>
             <label
               >Focus
-              <input type="number" name="focus" min="1" value="1" required
+              <input type="number" name="focus" min="1" value="${duck.stats.focus}" required
             /></label>
             <label
               >Intelligence
@@ -164,37 +152,21 @@ function renderDuck(duck) {
                 type="number"
                 name="intelligence"
                 min="1"
-                value="1"
+                value="${duck.stats.intelligence}"
                 required
             /></label>
           </div>
 
           <label>
             Kindness
-            <input type="number" name="kindness" min="1" value="1" required />
+            <input type="number" name="kindness" min="1" value="${duck.stats.kindness}" required />
           </label>
 
           <div class="actions">
-            <button type="submit">Submit Request</button>
+            <button type="submit">Update</button>
           </div>
           <small id="form-status" class="muted"></small>
         </form>`;
-
-  const preview = document.getElementById("duck-preview");
-
-  let previewHandle = null;
-  createDuckPreview(preview, {
-    colors: duck.body || {},
-    derpy: Boolean(duck.derpy),
-  })
-    .then((handle) => {
-      previewHandle = handle;
-      previewHandles.add(handle);
-    })
-    .catch(() => {
-      preview.textContent = "3D preview unavailable.";
-      preview.classList.add("muted");
-    });
 
   return template;
 }
@@ -234,6 +206,19 @@ async function loadPending() {
         const results = pending.filter((duck) => duck.name == value);
         results.forEach((duck) => {
           display.innerHTML = renderDuck(duck);
+          const preview = document.getElementById("duck-preview");
+
+          createDuckPreview(preview, {
+            colors: duck.body || {},
+            derpy: Boolean(duck.derpy),
+          })
+            .then((handle) => {
+              previewHandles.add(handle);
+            })
+            .catch(() => {
+              preview.textContent = "3D preview unavailable.";
+              preview.classList.add("muted");
+            });
         });
       });
     }
