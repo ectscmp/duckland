@@ -48,11 +48,11 @@ function renderDuck(duck) {
           <div class="grid-2">
             <label>
               Duck name
-              <input name="name" value=${duck.name} required />
+              <input name="name" value="${duck.name}" required />
             </label>
             <label>
               Assembler
-              <input name="assembler" value=${duck.assembler} required />
+              <input name="assembler" value="${duck.assembler}" required />
             </label>
           </div>
 
@@ -60,7 +60,7 @@ function renderDuck(duck) {
             Adjectives (comma separated)
             <input
               name="adjectives"
-              value=${duck.adjectives}
+              value="${duck.adjectives}"
               required
             />
           </label>
@@ -130,7 +130,7 @@ function renderDuck(duck) {
 
           <label>
             Date
-            <input type="date" name="date" value="${formatDate(duck.date.$date)}" required />
+            <input type="date" name="date" value="${formatDate(duck.date)}" required />
           </label>
 
           <div class="grid-2">
@@ -193,8 +193,9 @@ async function loadPending() {
     }
 
     const ducks = await response.json();
+    console.log(ducks);
     const pending = ducks.filter((duck) => duck.approved);
-    console.log(pending);
+    //console.log(pending);
     createSelect(pending);
 
     if (!pending.length) {

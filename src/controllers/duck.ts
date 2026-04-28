@@ -9,10 +9,19 @@ function invalidIdResponse(res: Response): void {
   res.status(400).json({ error: "Invalid duck id." });
 }
 
+//hack here
+function normalizeDuckRecord(duck: any) {
+  if (!(typeof duck.date == "string")) {
+    duck.date = duck.date["$date"];
+  }
+  return duck;
+}
+
 async function getAll(_req: Request, res: Response): Promise<void> {
   try {
     const ducks = await Duck.find().lean();
-    res.status(200).json(ducks);
+    //hack here
+    res.status(200).json(ducks.map((d) => normalizeDuckRecord(d)));
   } catch (error) {
     console.error("Error getting ducks:", error);
     res.status(500).json({ error: "Could not get ducks." });
@@ -32,20 +41,26 @@ async function getById(req: Request, res: Response): Promise<void> {
       res.status(404).json({ error: "Duck not found." });
       return;
     }
-    res.status(200).json(duck);
+    //hack here
+    res.status(200).json(normalizeDuckRecord(duck));
   } catch (error) {
     console.error("Error getting duck by id:", error);
     res.status(500).json({ error: "Could not get duck." });
   }
 }
 
-async function create(req: Request<unknown, unknown, DuckBody>, res: Response): Promise<void> {
+async function create(
+  req: Request<unknown, unknown, DuckBody>,
+  res: Response,
+): Promise<void> {
   try {
     const duck = await Duck.create(req.body);
     res.status(201).json(duck);
   } catch (error) {
     console.error("Error creating duck:", error);
-    res.status(400).json({ error: "Could not create duck. Check request body." });
+    res
+      .status(400)
+      .json({ error: "Could not create duck. Check request body." });
   }
 }
 
@@ -73,11 +88,16 @@ async function update(
     res.status(200).json(duck);
   } catch (error) {
     console.error("Error updating duck:", error);
-    res.status(400).json({ error: "Could not update duck. Check request body." });
+    res
+      .status(400)
+      .json({ error: "Could not update duck. Check request body." });
   }
 }
 
-async function remove(req: Request<{ id: string }>, res: Response): Promise<void> {
+async function remove(
+  req: Request<{ id: string }>,
+  res: Response,
+): Promise<void> {
   const { id } = req.params;
   if (!isValidObjectId(id)) {
     invalidIdResponse(res);
