@@ -15,27 +15,14 @@ const derpyInput = form.elements.namedItem("derpy");
 
 dateInput.value = new Date().toISOString().slice(0, 10);
 
-// color to hex function, probably needs replaced in the future
-function toHex(color) {
-  const colorDict = {
-    red: "#FF0000",
-    yellow: "#FFFF00",
-    green: "#008000",
-    blue: "#0000FF",
-    brown: "#8B4513",
-    purple: "#800080",
-    pink: "#FFC0CB",
-  };
-  return colorDict[color];
-}
 
 function readBodyColors(source) {
   return {
-    head: toHex(String(source.get("head")) || "#f0d35f"),
-    frontLeft: toHex(String(source.get("frontLeft")) || "#e9bc4f"),
-    frontRight: toHex(String(source.get("frontRight")) || "#d88f3d"),
-    rearLeft: toHex(String(source.get("rearLeft")) || "#9f6f2b"),
-    rearRight: toHex(String(source.get("rearRight")) || "#6f4b1f"),
+    head: String(source.get("head")),
+    frontLeft: String(source.get("frontLeft")),
+    frontRight: String(source.get("frontRight")),
+    rearLeft: String(source.get("rearLeft")),
+    rearRight: String(source.get("rearRight")),
   };
 }
 

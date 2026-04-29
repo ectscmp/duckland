@@ -29,7 +29,6 @@ function chooseDefualtColor(selected_color) {
       options += `<option value="${color.toLowerCase()}">${color.charAt(0).toUpperCase() + color.slice(1)}</option> `;
     }
   });
-  console.log(options);
   return options;
 }
 
@@ -164,7 +163,9 @@ function renderDuck(duck) {
 
           <div class="actions">
             <button type="submit">Update</button>
+            <button type="submit" class="delete-button">Delete</button>
           </div>
+
           <small id="form-status" class="muted"></small>
         </form>`;
 
@@ -220,6 +221,7 @@ async function loadPending() {
               preview.textContent = "3D preview unavailable.";
               preview.classList.add("muted");
             });
+          
         });
       });
     }

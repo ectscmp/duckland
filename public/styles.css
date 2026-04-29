@@ -180,10 +180,27 @@ small.ok {
 }
 
 .nav-bar {
-  display: flex;
   width: 100vw;
+  height: 10vh;
+  display: flex;
+  justify-content: space-between;
 }
 
-#sign-out {
+.nav-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.nav-bar-btn {
   margin: 10px;
+  height: auto;
+}
+
+.nav-bar-img {
+  height: auto;
+  margin: 10px;
+}
+
+.delete-button {
+  background-color: red;
 }

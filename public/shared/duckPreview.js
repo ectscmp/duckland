@@ -20,7 +20,7 @@ function toHex(color) {
     purple: "#800080",
     pink: "#FFC0CB",
   };
-  if (!(color in colorDict)) {
+  if (!(color.toLowerCase() in colorDict)) {
     return colorDict["yellow"];
   }
   return colorDict[color];
