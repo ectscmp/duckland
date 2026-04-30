@@ -15,7 +15,6 @@ const derpyInput = form.elements.namedItem("derpy");
 
 dateInput.value = new Date().toISOString().slice(0, 10);
 
-
 function readBodyColors(source) {
   return {
     head: String(source.get("head")),
@@ -64,6 +63,19 @@ form.addEventListener("submit", async (event) => {
 
   const data = new FormData(form);
   const adjectivesRaw = String(data.get("adjectives") || "");
+
+  let number_sum = 0;
+  number_sum += Number(data.get("strength"));
+  number_sum += Number(data.get("health"));
+  number_sum += Number(data.get("focus"));
+  number_sum += Number(data.get("intelligence"));
+  number_sum += Number(data.get("kindneness"));
+  if (number_sum > 20) {
+    statusText.classList.remove("muted");
+    statusText.classList.add("error");
+    statusText.innerHTML = "Attributes MUST be under 20.";
+    return;
+  }
 
   const payload = {
     name: String(data.get("name") || "").trim(),

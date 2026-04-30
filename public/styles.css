@@ -204,3 +204,15 @@ small.ok {
 .delete-button {
   background-color: red;
 }
+
+.input-greyed {
+  background-color: #f2f2f2;
+  color: #888;
+  border: 1px solid #ccc;
+  opacity: 0.7;
+}
+
+.attribute {
+  display: flex;
+  align-items: center;
+}

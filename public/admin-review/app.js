@@ -210,6 +210,68 @@ async function loadPending() {
           display.innerHTML = renderDuck(duck);
           const preview = document.getElementById("duck-preview");
 
+          const form = document.querySelector("#duck-form");
+          form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const statusText = document.querySelector("#form-status");
+            statusText.className = "muted";
+            statusText.textContent = "Submitting...";
+
+            const data = new FormData(form);
+            const adjectivesRaw = String(data.get("adjectives") || "");
+
+            const payload = {
+              name: String(data.get("name") || "").trim(),
+              assembler: String(data.get("assembler") || "").trim(),
+              adjectives: adjectivesRaw
+                .split(",")
+                .map((entry) => entry.trim())
+                .filter(Boolean),
+              body: {
+                // ...readBodyColors(data) - changed because we need base color strings
+                // this solution is pretty bad but it gets the job done for now
+                head: String(data.get("head") || "#f0d35f"),
+                frontLeft: String(data.get("frontLeft") || "#e9bc4f"),
+                frontRight: String(data.get("frontRight") || "#d88f3d"),
+                rearLeft: String(data.get("rearLeft") || "#9f6f2b"),
+                rearRight: String(data.get("rearRight") || "#6f4b1f"),
+              },
+              derpy: data.get("derpy") === "on",
+              bio: String(data.get("bio") || "").trim(),
+              date: String(data.get("date") || ""),
+              approved: true,
+              stats: {
+                strength: Number(data.get("strength") || 1),
+                health: Number(data.get("health") || 1),
+                focus: Number(data.get("focus") || 1),
+                intelligence: Number(data.get("intelligence") || 1),
+                kindness: Number(data.get("kindness") || 1),
+              },
+            };
+
+            console.log(typeof payload.date);
+            console.log(payload.date);
+
+            try {
+              const response = await fetch(`/ducks/${duck._id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+
+              if (!response.ok) {
+                throw new Error("Request failed.");
+              }
+
+              statusText.className = "ok";
+              statusText.textContent = "Patch Made!";
+            } catch (error) {
+              statusText.className = "error";
+              statusText.textContent =
+                "Could not submit request. Check fields and try again.";
+            }
+          });
+
           createDuckPreview(preview, {
             colors: duck.body || {},
             derpy: Boolean(duck.derpy),
@@ -221,7 +283,6 @@ async function loadPending() {
               preview.textContent = "3D preview unavailable.";
               preview.classList.add("muted");
             });
-          
         });
       });
     }

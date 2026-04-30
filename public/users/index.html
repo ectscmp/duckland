@@ -34,11 +34,11 @@
           <div class="grid-2">
             <label>
               Duck name
-              <input name="name" required />
+              <input max="15" name="name" required />
             </label>
             <label>
               Assembler
-              <input name="assembler" required />
+              <input id="assembler" name="assembler" required />
             </label>
           </div>
 
@@ -146,36 +146,77 @@
 
           <label>
             Date
-            <input type="date" name="date" required />
+            <input id="date" type="date" name="date" required />
           </label>
 
           <div class="grid-2">
             <label
-              >Strength
-              <input type="number" name="strength" min="1" value="1" required
-            /></label>
-            <label
-              >Health
-              <input type="number" name="health" min="1" value="1" required
-            /></label>
-            <label
-              >Focus
-              <input type="number" name="focus" min="1" value="1" required
-            /></label>
-            <label
-              >Intelligence
+              ><div class="attribute">
+                <p>Strength:</p>
+                <div id="strength-number">1</div>
+              </div>
               <input
-                type="number"
+                type="range"
+                name="strength"
+                min="1"
+                max="10"
+                value="1"
+                required
+            /></label>
+            <label
+              ><div class="attribute">
+                <p>Health:</p>
+                <div id="health-number">1</div>
+              </div>
+              <input
+                type="range"
+                name="health"
+                min="1"
+                max="10"
+                value="1"
+                required
+            /></label>
+            <label
+              ><div class="attribute">
+                <p>Focus:</p>
+                <div id="focus-number">1</div>
+              </div>
+              <input
+                type="range"
+                name="focus"
+                min="1"
+                max="10"
+                value="1"
+                required
+            /></label>
+            <label
+              ><div class="attribute">
+                <p>Intelligence:</p>
+                <div id="intelligence-number">1</div>
+              </div>
+              <input
+                type="range"
                 name="intelligence"
                 min="1"
+                max="10"
                 value="1"
                 required
             /></label>
           </div>
 
           <label>
-            Kindness
-            <input type="number" name="kindness" min="1" value="1" required />
+            <div class="attribute">
+              <p>Kindness:</p>
+              <div id="kindness-number">1</div>
+            </div>
+            <input
+              type="range"
+              name="kindness"
+              min="1"
+              max="10"
+              value="1"
+              required
+            />
           </label>
 
           <div class="actions">
@@ -186,5 +227,30 @@
       </section>
     </main>
     <script type="module" src="/users/app.js"></script>
+    <script>
+      const date = document.querySelector("#date");
+      const assembler = document.querySelector("#assembler");
+      const slider_list = document.querySelectorAll('input[type="range"]');
+      slider_list.forEach((slider) => {
+        slider.oninput = function () {
+          const number = document.querySelector(`#${slider.name}-number`);
+          number.innerHTML = this.value;
+        };
+      });
+
+      date.readOnly = true;
+      date.classList.add("input-greyed");
+
+      fetch("/api/me")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.user == null) {
+            return;
+          }
+          assembler.value = data.name;
+          assembler.readOnly = true;
+          assembler.classList.add("input-greyed");
+        });
+    </script>
   </body>
 </html>

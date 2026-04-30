@@ -116,6 +116,20 @@ app.get("/admin-review", checkUser, checkAdmin, (_req, res) => {
 
 app.use(express.static(publicDir));
 
+app.get("/api/me", (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ user: null });
+  }
+
+  let name = req.session.user.name;
+  name = name?.replace("CMP - ", "");
+  res.json({
+    user: req.session.user,
+    username: req.session.user.username,
+    name: name,
+  });
+});
+
 app.get("/redirect", async (_req, res) => {
   const code = _req.query.code as string;
   const tokenRequest = {
