@@ -71,7 +71,7 @@ function renderDuck(duck) {
 
           <fieldset>
             <legend>Duck Parts Colors</legend>
-            <div class="grid-2">
+            <div class="grid-2 duck-colors">
               <label>
                 Head
                 <select name="head" required>
@@ -200,7 +200,7 @@ async function loadPending() {
     createSelect(pending);
 
     if (!pending.length) {
-      display.innerHTML = `<div class="card"><p class="muted">Ducks cant be loaded.</p></div>`;
+      display.innerHTML = `<div class="card"><p class="muted">Ducks cannot be loaded.</p></div>`;
     } else {
       dropDown.addEventListener("change", function () {
         display.innerHTML = "";
@@ -238,7 +238,7 @@ async function loadPending() {
               },
               derpy: data.get("derpy") === "on",
               bio: String(data.get("bio") || "").trim(),
-              date: String(data.get("date") || ""),
+              date: new Date(data.get("date") || ""),
               approved: true,
               stats: {
                 strength: Number(data.get("strength") || 1),
@@ -248,9 +248,6 @@ async function loadPending() {
                 kindness: Number(data.get("kindness") || 1),
               },
             };
-
-            console.log(typeof payload.date);
-            console.log(payload.date);
 
             try {
               const response = await fetch(`/ducks/${duck._id}`, {
@@ -278,6 +275,21 @@ async function loadPending() {
           })
             .then((handle) => {
               previewHandles.add(handle);
+              const colorSelects = document.querySelectorAll(
+                "duck.colors label select",
+              );
+              console.l
+              colorSelects.forEach((select) => {
+                select.addEventListener("change", () => {
+                  handle.updateColors({
+                    head: String(data.get("head")),
+                    frontLeft: String(data.get("frontLeft")),
+                    frontRight: String(data.get("frontRight")),
+                    rearLeft: String(data.get("rearLeft")),
+                    rearRight: String(data.get("rearRight")),
+                  });
+                });
+              });
             })
             .catch(() => {
               preview.textContent = "3D preview unavailable.";

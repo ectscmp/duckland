@@ -11,8 +11,10 @@ function invalidIdResponse(res: Response): void {
 
 //hack here
 function normalizeDuckRecord(duck: any) {
-  if (!(typeof duck.date == "string")) {
-    duck.date = duck.date["$date"];
+  if (duck.date instanceof Date) {
+    duck.date = duck.date.toISOString();
+  } else if (duck.date && duck.date.$date) {
+    duck.date = duck.date.$date;
   }
   return duck;
 }
@@ -75,6 +77,9 @@ async function update(
   }
 
   try {
+    if (req.body.date) {
+      req.body.date = new Date(req.body.date);
+    }
     const duck = await Duck.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,
