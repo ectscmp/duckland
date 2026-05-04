@@ -7,18 +7,41 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
+    <nav class="nav-bar">
+      <img
+        class="nav-bar-img"
+        src="images\cropped-ects-logo.png"
+        alt="ECTS logo"
+      />
+      <div class="nav-buttons">
+        <a class="btn nav-bar-btn" href="/">Home</a>
+        <a class="btn nav-bar-btn" href="/users">Users</a>
+        <a class="btn nav-bar-btn" style="margin-right: 20px" href="/signout"
+          >Sign Out</a
+        >
+      </div>
+    </nav>
     <main class="shell">
       <div class="actions" style="margin-bottom: 1rem">
         <a class="btn secondary" href="/admin">Back</a>
-        <a class="btn secondary" href="/admin-review">Current Ducks</a>
+        <a class="btn secondary" href="/admin-aprove">Aprove Ducks</a>
       </div>
 
+      <div id="overlay" class="overlay hidden">
+        <div class="overlay-content">
+          <h1 style="color: red">Are you sure you want to delete this duck?</h1>
+          <div style="margin-top: 50px">
+            <button id="yes-overlay">Yes</button>
+            <button id="no-overlay" style="background-color: red">No</button>
+          </div>
+        </div>
+      </div>
       <section class="panel">
         <div
           class="actions"
           style="justify-content: space-between; align-items: center"
         >
-        <select name="Ducks" id="duck-selection"></select>
+          <select name="Ducks" id="duck-selection"></select>
           <button id="refresh" class="secondary" type="button">Refresh</button>
         </div>
         <div id="pending-list" class="cards" style="margin-top: 0.75rem"></div>

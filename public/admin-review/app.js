@@ -5,95 +5,180 @@ const dropDown = document.getElementById("duck-selection");
 const refreshBtn = document.getElementById("refresh");
 const previewHandles = new Set();
 
-function renderCard(duck) {
-  const card = document.createElement("article");
-  card.className = "card";
+function checkDerpy(duck) {
+  if (duck.derpy) {
+    return "checked";
+  }
+}
 
-  const title = document.createElement("h3");
-  title.textContent = `${duck.name} by ${duck.assembler}`;
-
-  const bio = document.createElement("p");
-  bio.textContent = duck.bio;
-
-  const meta = document.createElement("p");
-  meta.className = "statline";
-  meta.textContent = `Date: ${new Date(duck.date).toLocaleDateString()} | Adjectives: ${duck.adjectives.join(", ")}`;
-
-  const stats = duck.stats || {};
-  const statLine = document.createElement("p");
-  statLine.className = "statline";
-  statLine.textContent = `STR ${stats.strength ?? "-"} | HP ${stats.health ?? "-"} | FOC ${stats.focus ?? "-"} | INT ${stats.intelligence ?? "-"} | KND ${stats.kindness ?? "-"}`;
-
-  const derpy = document.createElement("p");
-  derpy.className = "statline";
-  derpy.textContent = `Derpy: ${duck.derpy ? "Yes" : "No"}`;
-
-  const preview = document.createElement("div");
-  preview.className = "duck-preview";
-  preview.setAttribute("aria-label", `${duck.name} 3D preview`);
-
-  let previewHandle = null;
-  createDuckPreview(preview, {
-    colors: duck.body || {},
-    derpy: Boolean(duck.derpy),
-  })
-    .then((handle) => {
-      previewHandle = handle;
-      previewHandles.add(handle);
-    })
-    .catch(() => {
-      preview.textContent = "3D preview unavailable.";
-      preview.classList.add("muted");
-    });
-
-  const actions = document.createElement("div");
-  actions.className = "actions";
-
-  const approveBtn = document.createElement("button");
-  approveBtn.type = "button";
-  approveBtn.textContent = "Approve";
-
-  approveBtn.addEventListener("click", async () => {
-    approveBtn.disabled = true;
-    approveBtn.textContent = "Approving...";
-
-    try {
-      const response = await fetch(`/ducks/${duck._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approved: true }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Could not approve.");
-      }
-
-      if (previewHandle) {
-        previewHandle.dispose();
-        previewHandles.delete(previewHandle);
-      }
-      card.remove();
-      if (!display.children.length) {
-        display.innerHTML = `<div class="card"><p class="muted">No pending requests.</p></div>`;
-      }
-    } catch (error) {
-      approveBtn.disabled = false;
-      approveBtn.textContent = "Approve";
-      statusEl.className = "error";
-      statusEl.textContent = "Failed to approve a request.";
+function chooseDefualtColor(selected_color) {
+  const color_list = [
+    "red",
+    "yellow",
+    "green",
+    "blue",
+    "brown",
+    "purple",
+    "pink",
+  ];
+  let options = "";
+  color_list.forEach((color) => {
+    if (color.toLowerCase() == selected_color.toLowerCase()) {
+      options += `<option value="${color.toLowerCase()}" selected>${color.charAt(0).toUpperCase() + color.slice(1)}</option> `;
+    } else {
+      options += `<option value="${color.toLowerCase()}">${color.charAt(0).toUpperCase() + color.slice(1)}</option> `;
     }
   });
+  return options;
+}
 
-  actions.append(approveBtn);
-  card.append(title, meta, bio, statLine, derpy, preview, actions);
-  return card;
+function formatDate(isoString) {
+  const date = new Date(isoString);
+
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function renderDuck(duck) {
+  let template = `<form id="duck-form">
+          <div class="grid-2">
+            <label>
+              Duck name
+              <input name="name" value="${duck.name}" required />
+            </label>
+            <label>
+              Assembler
+              <input name="assembler" value="${duck.assembler}" required />
+            </label>
+          </div>
+
+          <label>
+            Adjectives (comma separated)
+            <input
+              name="adjectives"
+              value="${duck.adjectives}"
+              required
+            />
+          </label>
+
+          <label>
+            Bio
+            <textarea name="bio" required>${duck.bio}</textarea>
+          </label>
+
+          <fieldset>
+            <legend>Duck Parts Colors</legend>
+            <div class="grid-2 duck-colors">
+              <label>
+                Head
+                <select name="head" required>
+                  ${chooseDefualtColor(duck.body.head)}
+                </select>
+              </label>
+
+              <label>
+                Front Left
+                <select name="frontLeft" required>
+                  ${chooseDefualtColor(duck.body.frontLeft)}
+                </select>
+              </label>
+
+              <label>
+                Front Right
+                <select name="frontRight" required>
+                  ${chooseDefualtColor(duck.body.frontRight)}
+                </select>
+              </label>
+
+              <label>
+                Rear Left
+                <select name="rearLeft" required>
+                  ${chooseDefualtColor(duck.body.rearLeft)}>
+                </select>
+              </label>
+
+              <label>
+                Rear Right
+                <select name="rearRight" required>
+                  ${chooseDefualtColor(duck.body.rearRight)}
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <label class="inline-check">
+            <input type="checkbox" name="derpy" ${checkDerpy(duck)}/>
+            Derpy
+          </label>
+
+          <section class="preview-shell" aria-label="Duck preview">
+            <h2>3D Preview</h2>
+            <p class="muted" style="margin-top: 0">
+              Updates as you change duck colors.
+            </p>
+            <div
+              id="duck-preview"
+              class="duck-preview"
+              role="img"
+              aria-label="Spinning 3D duck preview"
+            ></div>
+          </section>
+
+          <label>
+            Date
+            <input type="date" name="date" value="${formatDate(duck.date)}" required />
+          </label>
+
+          <div class="grid-2">
+            <label
+              >Strength
+              <input type="number" name="strength" min="1" value="${duck.stats.strength}" required
+            /></label>
+            <label
+              >Health
+              <input type="number" name="health" min="1" value="${duck.stats.health}" required
+            /></label>
+            <label
+              >Focus
+              <input type="number" name="focus" min="1" value="${duck.stats.focus}" required
+            /></label>
+            <label
+              >Intelligence
+              <input
+                type="number"
+                name="intelligence"
+                min="1"
+                value="${duck.stats.intelligence}"
+                required
+            /></label>
+          </div>
+
+          <label>
+            Kindness
+            <input type="number" name="kindness" min="1" value="${duck.stats.kindness}" required />
+          </label>
+
+          <div class="actions">
+            <button type="submit" value="update">Update</button>
+            <button type="submit" value="delete">Delete</button>
+          </div>
+
+          <small id="form-status" class="muted"></small>
+        </form>`;
+
+  return template;
 }
 
 function createSelect(ducks) {
-  for (let duck in ducks) {
-    console.log(duck);
-    opt = document.createElement("option");
-  }
+  ducks.forEach((duck) => {
+    const opt = document.createElement("option");
+    opt.value = duck.name;
+    opt.innerHTML = duck.name;
+    dropDown.append(opt);
+  });
 }
 
 async function loadPending() {
@@ -101,6 +186,7 @@ async function loadPending() {
   previewHandles.clear();
 
   display.innerHTML = "";
+  dropDown.innerHTML = "";
 
   try {
     const response = await fetch("/ducks");
@@ -109,13 +195,143 @@ async function loadPending() {
     }
 
     const ducks = await response.json();
-    const pending = createSelect(ducks);
+    console.log(ducks);
+    const pending = ducks.filter((duck) => duck.approved);
+    //console.log(pending);
+    createSelect(pending);
 
     if (!pending.length) {
-      display.innerHTML = `<div class="card"><p class="muted">No pending requests.</p></div>`;
+      display.innerHTML = `<div class="card"><p class="muted">Ducks cannot be loaded.</p></div>`;
     } else {
-      pending.forEach((duck) => {
-        display.append(renderCard(duck));
+      dropDown.addEventListener("change", function () {
+        display.innerHTML = "";
+        const value = this.value;
+        const results = pending.filter((duck) => duck.name == value);
+        results.forEach((duck) => {
+          display.innerHTML = renderDuck(duck);
+          const preview = document.getElementById("duck-preview");
+
+          const form = document.querySelector("#duck-form");
+          form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const statusText = document.querySelector("#form-status");
+            statusText.className = "muted";
+            statusText.textContent = "Submitting...";
+
+            const data = new FormData(form);
+            const action = event.submitter.value;
+            console.log(action);
+
+            if (action == "update") {
+              const adjectivesRaw = String(data.get("adjectives") || "");
+              const payload = {
+                name: String(data.get("name") || "").trim(),
+                assembler: String(data.get("assembler") || "").trim(),
+                adjectives: adjectivesRaw
+                  .split(",")
+                  .map((entry) => entry.trim())
+                  .filter(Boolean),
+                body: {
+                  // ...readBodyColors(data) - changed because we need base color strings
+                  // this solution is pretty bad but it gets the job done for now
+                  head: String(data.get("head") || "#f0d35f"),
+                  frontLeft: String(data.get("frontLeft") || "#e9bc4f"),
+                  frontRight: String(data.get("frontRight") || "#d88f3d"),
+                  rearLeft: String(data.get("rearLeft") || "#9f6f2b"),
+                  rearRight: String(data.get("rearRight") || "#6f4b1f"),
+                },
+                derpy: data.get("derpy") === "on",
+                bio: String(data.get("bio") || "").trim(),
+                date: new Date(data.get("date") || ""),
+                approved: true,
+                stats: {
+                  strength: Number(data.get("strength") || 1),
+                  health: Number(data.get("health") || 1),
+                  focus: Number(data.get("focus") || 1),
+                  intelligence: Number(data.get("intelligence") || 1),
+                  kindness: Number(data.get("kindness") || 1),
+                },
+              };
+
+              try {
+                const response = await fetch(`/ducks/${duck._id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                  throw new Error("Request failed.");
+                }
+
+                statusText.className = "ok";
+                statusText.textContent = "Patch Made!";
+              } catch (error) {
+                statusText.className = "error";
+                statusText.textContent =
+                  "Could not submit request. Check fields and try again.";
+              }
+            } else if (action == "delete") {
+              const overlay = document.querySelector("#overlay");
+              const yes_button = document.querySelector("#yes-overlay");
+              const no_button = document.querySelector("#no-overlay");
+              overlay.classList.remove("hidden");
+
+              yes_button.addEventListener("click", () => {
+                try {
+                  const response = fetch(`/ducks/${duck._id}`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                  });
+
+                  if (response.error) {
+                    throw new Error("Request failed.");
+                  }
+
+                  statusText.className = "ok";
+                  statusText.textContent = "Patch Made!";
+                } catch (error) {
+                  statusText.className = "error";
+                  statusText.textContent =
+                    "Could not submit request. Check fields and try again.";
+                }
+                overlay.classList.add("hidden");
+                loadPending();
+              });
+
+              no_button.addEventListener("click", () => {
+                overlay.classList.add("hidden");
+              });
+            }
+          });
+
+          createDuckPreview(preview, {
+            colors: duck.body || {},
+            derpy: Boolean(duck.derpy),
+          })
+            .then((handle) => {
+              previewHandles.add(handle);
+              const colorSelects = document.querySelectorAll(
+                "duck.colors label select",
+              );
+              console.l;
+              colorSelects.forEach((select) => {
+                select.addEventListener("change", () => {
+                  handle.updateColors({
+                    head: String(data.get("head")),
+                    frontLeft: String(data.get("frontLeft")),
+                    frontRight: String(data.get("frontRight")),
+                    rearLeft: String(data.get("rearLeft")),
+                    rearRight: String(data.get("rearRight")),
+                  });
+                });
+              });
+            })
+            .catch(() => {
+              preview.textContent = "3D preview unavailable.";
+              preview.classList.add("muted");
+            });
+        });
       });
     }
   } catch (error) {

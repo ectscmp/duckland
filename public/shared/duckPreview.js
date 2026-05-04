@@ -10,12 +10,20 @@ const objLoader = new OBJLoader();
 
 let templatePromise = null;
 
-function toHex(value, fallback) {
-  if (typeof value !== "string") {
-    return fallback;
+function toHex(color) {
+  const colorDict = {
+    red: "#FF0000",
+    yellow: "#FFFF00",
+    green: "#008000",
+    blue: "#0000FF",
+    brown: "#8B4513",
+    purple: "#800080",
+    pink: "#FFC0CB",
+  };
+  if (!(color.toLowerCase() in colorDict)) {
+    return colorDict["yellow"];
   }
-
-  return /^#[0-9A-Fa-f]{6}$/.test(value) ? value : fallback;
+  return colorDict[color];
 }
 
 function asArray(material) {
@@ -200,9 +208,13 @@ function applyTiltLeveling(duckRig, centers) {
   const leveledBeak = leveledCenters.get("beak");
 
   const front = averageVectors(
-    [leveledHead, leveledBeak, leveledFrontRight, leveledFrontLeft].filter(Boolean),
+    [leveledHead, leveledBeak, leveledFrontRight, leveledFrontLeft].filter(
+      Boolean,
+    ),
   );
-  const rear = averageVectors([leveledRearRight, leveledRearLeft].filter(Boolean));
+  const rear = averageVectors(
+    [leveledRearRight, leveledRearLeft].filter(Boolean),
+  );
 
   if (!front || !rear) {
     return;
@@ -220,7 +232,9 @@ function orientDuckRig(duckRig, duckModel) {
   const centers = collectNamedCenters(duckModel);
 
   const front = averageVectors(
-    [centers.get("head"), centers.get("beak"), centers.get("eyes")].filter(Boolean),
+    [centers.get("head"), centers.get("beak"), centers.get("eyes")].filter(
+      Boolean,
+    ),
   );
   const rear = averageVectors(
     [centers.get("rear_right"), centers.get("rear_left")].filter(Boolean),
@@ -228,7 +242,9 @@ function orientDuckRig(duckRig, duckModel) {
   const right = averageVectors(
     [centers.get("front_right"), centers.get("rear_right")].filter(Boolean),
   );
-  const left = averageVectors([centers.get("front_left"), centers.get("rear_left")].filter(Boolean));
+  const left = averageVectors(
+    [centers.get("front_left"), centers.get("rear_left")].filter(Boolean),
+  );
 
   if (!front || !rear || !right || !left) {
     // Fallback for incomplete models.
@@ -238,7 +254,9 @@ function orientDuckRig(duckRig, duckModel) {
 
   const modelRight = right.clone().sub(left).normalize();
   const modelFront = front.clone().sub(rear).normalize();
-  let modelUp = new THREE.Vector3().crossVectors(modelRight, modelFront).normalize();
+  let modelUp = new THREE.Vector3()
+    .crossVectors(modelRight, modelFront)
+    .normalize();
 
   if (modelUp.lengthSq() < 1e-8) {
     duckRig.rotation.x = -Math.PI / 2;
@@ -250,10 +268,18 @@ function orientDuckRig(duckRig, duckModel) {
   }
 
   // Re-orthogonalize to ensure a clean basis before conversion.
-  const frontOrtho = new THREE.Vector3().crossVectors(modelUp, modelRight).normalize();
-  const rightOrtho = new THREE.Vector3().crossVectors(frontOrtho, modelUp).normalize();
+  const frontOrtho = new THREE.Vector3()
+    .crossVectors(modelUp, modelRight)
+    .normalize();
+  const rightOrtho = new THREE.Vector3()
+    .crossVectors(frontOrtho, modelUp)
+    .normalize();
 
-  const modelBasis = new THREE.Matrix4().makeBasis(rightOrtho, modelUp, frontOrtho);
+  const modelBasis = new THREE.Matrix4().makeBasis(
+    rightOrtho,
+    modelUp,
+    frontOrtho,
+  );
   const alignToWorld = modelBasis.clone().invert();
   duckRig.quaternion.setFromRotationMatrix(alignToWorld);
 
@@ -362,7 +388,8 @@ export async function createDuckPreview(container, options = {}) {
   window.addEventListener("resize", resize);
 
   let rafId = 0;
-  const speed = typeof options.spinSpeed === "number" ? options.spinSpeed : 0.01;
+  const speed =
+    typeof options.spinSpeed === "number" ? options.spinSpeed : 0.01;
 
   function draw() {
     spinPivot.rotation.y += speed;
