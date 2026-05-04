@@ -162,8 +162,8 @@ function renderDuck(duck) {
           </label>
 
           <div class="actions">
-            <button type="submit">Update</button>
-            <button type="submit" class="delete-button">Delete</button>
+            <button type="submit" value="update">Update</button>
+            <button type="submit" value="delete">Delete</button>
           </div>
 
           <small id="form-status" class="muted"></small>
@@ -186,6 +186,7 @@ async function loadPending() {
   previewHandles.clear();
 
   display.innerHTML = "";
+  dropDown.innerHTML = "";
 
   try {
     const response = await fetch("/ducks");
@@ -218,54 +219,89 @@ async function loadPending() {
             statusText.textContent = "Submitting...";
 
             const data = new FormData(form);
-            const adjectivesRaw = String(data.get("adjectives") || "");
+            const action = event.submitter.value;
+            console.log(action);
 
-            const payload = {
-              name: String(data.get("name") || "").trim(),
-              assembler: String(data.get("assembler") || "").trim(),
-              adjectives: adjectivesRaw
-                .split(",")
-                .map((entry) => entry.trim())
-                .filter(Boolean),
-              body: {
-                // ...readBodyColors(data) - changed because we need base color strings
-                // this solution is pretty bad but it gets the job done for now
-                head: String(data.get("head") || "#f0d35f"),
-                frontLeft: String(data.get("frontLeft") || "#e9bc4f"),
-                frontRight: String(data.get("frontRight") || "#d88f3d"),
-                rearLeft: String(data.get("rearLeft") || "#9f6f2b"),
-                rearRight: String(data.get("rearRight") || "#6f4b1f"),
-              },
-              derpy: data.get("derpy") === "on",
-              bio: String(data.get("bio") || "").trim(),
-              date: new Date(data.get("date") || ""),
-              approved: true,
-              stats: {
-                strength: Number(data.get("strength") || 1),
-                health: Number(data.get("health") || 1),
-                focus: Number(data.get("focus") || 1),
-                intelligence: Number(data.get("intelligence") || 1),
-                kindness: Number(data.get("kindness") || 1),
-              },
-            };
+            if (action == "update") {
+              const adjectivesRaw = String(data.get("adjectives") || "");
+              const payload = {
+                name: String(data.get("name") || "").trim(),
+                assembler: String(data.get("assembler") || "").trim(),
+                adjectives: adjectivesRaw
+                  .split(",")
+                  .map((entry) => entry.trim())
+                  .filter(Boolean),
+                body: {
+                  // ...readBodyColors(data) - changed because we need base color strings
+                  // this solution is pretty bad but it gets the job done for now
+                  head: String(data.get("head") || "#f0d35f"),
+                  frontLeft: String(data.get("frontLeft") || "#e9bc4f"),
+                  frontRight: String(data.get("frontRight") || "#d88f3d"),
+                  rearLeft: String(data.get("rearLeft") || "#9f6f2b"),
+                  rearRight: String(data.get("rearRight") || "#6f4b1f"),
+                },
+                derpy: data.get("derpy") === "on",
+                bio: String(data.get("bio") || "").trim(),
+                date: new Date(data.get("date") || ""),
+                approved: true,
+                stats: {
+                  strength: Number(data.get("strength") || 1),
+                  health: Number(data.get("health") || 1),
+                  focus: Number(data.get("focus") || 1),
+                  intelligence: Number(data.get("intelligence") || 1),
+                  kindness: Number(data.get("kindness") || 1),
+                },
+              };
 
-            try {
-              const response = await fetch(`/ducks/${duck._id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
+              try {
+                const response = await fetch(`/ducks/${duck._id}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                  throw new Error("Request failed.");
+                }
+
+                statusText.className = "ok";
+                statusText.textContent = "Patch Made!";
+              } catch (error) {
+                statusText.className = "error";
+                statusText.textContent =
+                  "Could not submit request. Check fields and try again.";
+              }
+            } else if (action == "delete") {
+              const overlay = document.querySelector("#overlay");
+              const yes_button = document.querySelector("#yes-overlay");
+              const no_button = document.querySelector("#no-overlay");
+              overlay.classList.remove("hidden");
+
+              yes_button.addEventListener("click", () => {
+                try {
+                  const response = fetch(`/ducks/${duck._id}`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                  });
+
+                  if (response.error) {
+                    throw new Error("Request failed.");
+                  }
+
+                  statusText.className = "ok";
+                  statusText.textContent = "Patch Made!";
+                } catch (error) {
+                  statusText.className = "error";
+                  statusText.textContent =
+                    "Could not submit request. Check fields and try again.";
+                }
+                overlay.classList.add("hidden");
+                loadPending();
               });
 
-              if (!response.ok) {
-                throw new Error("Request failed.");
-              }
-
-              statusText.className = "ok";
-              statusText.textContent = "Patch Made!";
-            } catch (error) {
-              statusText.className = "error";
-              statusText.textContent =
-                "Could not submit request. Check fields and try again.";
+              no_button.addEventListener("click", () => {
+                overlay.classList.add("hidden");
+              });
             }
           });
 
@@ -278,7 +314,7 @@ async function loadPending() {
               const colorSelects = document.querySelectorAll(
                 "duck.colors label select",
               );
-              console.l
+              console.l;
               colorSelects.forEach((select) => {
                 select.addEventListener("change", () => {
                   handle.updateColors({

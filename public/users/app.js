@@ -69,7 +69,7 @@ form.addEventListener("submit", async (event) => {
   number_sum += Number(data.get("health"));
   number_sum += Number(data.get("focus"));
   number_sum += Number(data.get("intelligence"));
-  number_sum += Number(data.get("kindneness"));
+  number_sum += Number(data.get("kindness"));
   if (number_sum > 20) {
     statusText.classList.remove("muted");
     statusText.classList.add("error");
@@ -117,7 +117,6 @@ form.addEventListener("submit", async (event) => {
       throw new Error("Request failed.");
     }
 
-    form.reset();
     dateInput.value = new Date().toISOString().slice(0, 10);
     previewHandle?.updateColors(readBodyColors(new FormData(form)));
     previewHandle?.updateDerpy(Boolean(derpyInput?.checked));

@@ -33,7 +33,10 @@ function renderCard(duck) {
   preview.setAttribute("aria-label", `${duck.name} 3D preview`);
 
   let previewHandle = null;
-  createDuckPreview(preview, { colors: duck.body || {}, derpy: Boolean(duck.derpy) })
+  createDuckPreview(preview, {
+    colors: duck.body || {},
+    derpy: Boolean(duck.derpy),
+  })
     .then((handle) => {
       previewHandle = handle;
       previewHandles.add(handle);
@@ -48,10 +51,50 @@ function renderCard(duck) {
 
   const approveBtn = document.createElement("button");
   approveBtn.type = "button";
+  approveBtn.value = "approve";
   approveBtn.textContent = "Approve";
+
+  const denyBtn = document.createElement("button");
+  denyBtn.style = "background-color: red";
+  denyBtn.type = "button";
+  denyBtn.value = "deny";
+  denyBtn.textContent = "Deny";
+
+  denyBtn.addEventListener("click", async () => {
+    approveBtn.disabled = true;
+    denyBtn.disabled = true;
+    denyBtn.textContent = "Denying...";
+
+    try {
+      const response = await fetch(`/ducks/${duck._id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error("Could not Deny.");
+      }
+
+      if (previewHandle) {
+        previewHandle.dispose();
+        previewHandles.delete(previewHandle);
+      }
+      card.remove();
+      if (!listEl.children.length) {
+        listEl.innerHTML = `<div class="card"><p class="muted">No pending requests.</p></div>`;
+      }
+    } catch (error) {
+      approveBtn.disabled = false;
+      denyBtn.disabled = false;
+      denyBtn.textContent = "Deny";
+      statusEl.className = "error";
+      statusEl.textContent = "Failed to deny a request.";
+    }
+  });
 
   approveBtn.addEventListener("click", async () => {
     approveBtn.disabled = true;
+    denyBtn.disabled = true;
     approveBtn.textContent = "Approving...";
 
     try {
@@ -82,6 +125,7 @@ function renderCard(duck) {
   });
 
   actions.append(approveBtn);
+  actions.append(denyBtn);
   card.append(title, meta, bio, statLine, derpy, preview, actions);
   return card;
 }
