@@ -70,7 +70,7 @@ form.addEventListener("submit", async (event) => {
   number_sum += Number(data.get("focus"));
   number_sum += Number(data.get("intelligence"));
   number_sum += Number(data.get("kindness"));
-  if (number_sum > 20) {
+  if (number_sum > 20 || number_sum <= 0) {
     statusText.classList.remove("muted");
     statusText.classList.add("error");
     statusText.innerHTML = "Attributes MUST be under 20.";
