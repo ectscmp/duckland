@@ -163,7 +163,7 @@ function renderDuck(duck) {
 
           <div class="actions">
             <button type="submit" value="update">Update</button>
-            <button type="submit" value="delete">Delete</button>
+            <button type="submit" style="background-color: red" value="delete">Delete</button>
           </div>
 
           <small id="form-status" class="muted"></small>

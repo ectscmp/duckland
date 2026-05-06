@@ -11,7 +11,7 @@ import { ConfidentialClientApplication } from "@azure/msal-node";
 import dotenv from "dotenv";
 import type { Request, Response, NextFunction } from "express";
 import { Admin } from "./models/admin.js";
-import { userInfo } from "node:os";
+import crypto from "crypto";
 
 await attemptDatabaseConnection();
 const app: express.Application = express();
@@ -82,6 +82,11 @@ app.get("/", async (_req, res) => {
 
   const authUrl = await msalClient.getAuthCodeUrl(authCodeUrlParameters);
   res.redirect(authUrl);
+});
+
+app.get("/api/key", (_req, res) => {
+  const apiKey = crypto.randomBytes(32).toString("hex");
+  res.json({ key: apiKey });
 });
 
 app.get("/signout", (_req, res) => {
@@ -159,7 +164,7 @@ app.get("/docs.json", (_req, res) => {
   res.status(200).json(openApiSpec);
 });
 
-app.get("/docs", (_req, res) => {
+app.get("/docs", checkUser, (_req, res) => {
   res.type("html").send(`<!doctype html>
 <html lang="en">
   <head>
@@ -167,8 +172,24 @@ app.get("/docs", (_req, res) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Duckland API Docs</title>
     <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css" />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
+    <nav class="nav-bar">
+      <img
+        class="nav-bar-img"
+        src="../images/cropped-ects-logo.png"
+        alt="ECTS logo"
+      />
+      <div class="nav-buttons">
+        <a class="btn nav-bar-btn" href="/">Home</a>
+        <a class="btn nav-bar-btn" href="/users">Users</a>
+        <a class="btn nav-bar-btn" href="/admin">Admin</a>
+        <a class="btn nav-bar-btn" style="margin-right: 20px" href="/signout"
+          >Sign Out</a
+        >
+      </div>
+    </nav>
     <div id="swagger-ui"></div>
     <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
     <script>
