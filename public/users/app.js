@@ -3,6 +3,7 @@ import { createDuckPreview } from "/shared/duckPreview.js";
 const form = document.getElementById("duck-form");
 const statusText = document.getElementById("form-status");
 const dateInput = form.elements.namedItem("date");
+const submitButton = document.getElementById("submit-button");
 const previewContainer = document.getElementById("duck-preview");
 const colorFieldNames = [
   "head",
@@ -58,6 +59,8 @@ if (previewContainer) {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+
+  submitButton.disabled = true;
   statusText.className = "muted";
   statusText.textContent = "Submitting...";
 
@@ -73,6 +76,7 @@ form.addEventListener("submit", async (event) => {
   if (number_sum > 20 || number_sum <= 0) {
     statusText.classList.remove("muted");
     statusText.classList.add("error");
+    submitButton.disabled = false;
     statusText.innerHTML = "Attributes MUST be under 20.";
     return;
   }
@@ -114,6 +118,7 @@ form.addEventListener("submit", async (event) => {
     });
 
     if (!response.ok) {
+      submitButton.disabled = false;
       throw new Error("Request failed.");
     }
 
@@ -122,7 +127,9 @@ form.addEventListener("submit", async (event) => {
     previewHandle?.updateDerpy(Boolean(derpyInput?.checked));
     statusText.className = "ok";
     statusText.textContent = "Duck request sent. Waiting for admin approval.";
+    window.location.assign("/form-submitted");
   } catch (error) {
+    submitButton.disabled = false;
     statusText.className = "error";
     statusText.textContent =
       "Could not submit request. Check fields and try again.";

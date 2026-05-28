@@ -119,6 +119,10 @@ app.get("/admin-review", checkUser, checkAdmin, (_req, res) => {
   res.sendFile(path.join(publicDir, "admin-review", "index.html"));
 });
 
+app.get("/form-submitted", (_req, res) => {
+  res.sendFile(path.join(publicDir, "form-submitted", "index.html"));
+});
+
 app.use(express.static(publicDir));
 
 app.get("/api/me", (req, res) => {
